@@ -1,0 +1,34 @@
+#include "Renderer.h"
+
+Renderer::Renderer()
+{
+    std::cout << "Renderer Object Created" << std::endl;
+}
+
+void Renderer::render(std::vector<Model*> &models, Camera &camera)
+{
+    // Get Matrices for view and projection from the camera
+    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 projection = camera.getProjectionMatrix(WINDOW_WIDTH / WINDOW_HEIGHT);
+
+    // Loop through list of models, get each models meshse, set shaders matrices, and draw
+    for (Model* model : models) {
+        glm::mat4 modelMatrix = model->getTransform();
+        
+        for (const Mesh& mesh : model->getMeshes()) {
+            Material* material = mesh.material;
+            Shader* shader = material->shader;
+
+            shader->use();
+            material->Apply();
+
+            shader->setMat4("model", modelMatrix);
+            shader->setMat4("view", view);
+            shader->setMat4("projection", projection);
+
+            mesh.draw(*shader);
+        }
+    }
+
+
+}

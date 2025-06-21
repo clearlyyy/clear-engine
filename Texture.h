@@ -1,3 +1,6 @@
+#ifndef TEXTURE_H
+#define TEXTURE_H
+
 #include <glad/glad.h>
 #include <string>
 #include "Shader.h"
@@ -15,3 +18,5 @@ class Texture {
     void use();
     void setTexture(Shader shaderProgram, const std::string& type);
 };
+
+#endif // TEXTURE_H

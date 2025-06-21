@@ -60,5 +60,6 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "xhash": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/clearly/Desktop/Code/clear-engine/include/glm"
 }

@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "Globals.h"
 
 // Camera Constructor fuck it
 Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
@@ -26,6 +27,10 @@ void Camera::updateCameraVectors()
 glm::mat4 Camera::GetViewMatrix()
 {
     return glm::lookAt(Position, Position + Front, Up);
+}
+
+glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
+    return glm::perspective(glm::radians(70.0f), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
 }
 
 glm::vec3 Camera::getPosition()

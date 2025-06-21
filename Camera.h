@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glm/glm.hpp>
 
 #include "Shader.h"
@@ -40,5 +42,7 @@ class Camera {
         void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
         void processMouseScroll(float yoffset);
         glm::mat4 GetViewMatrix();
+        glm::mat4 getProjectionMatrix(float aspectRatio) const;
         glm::vec3 getPosition();
+
 };
