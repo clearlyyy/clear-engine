@@ -21,19 +21,14 @@ class Camera {
     private:
 
         //Camera Transforms
-        glm::vec3 Position;
-        glm::vec3 Front;
-        glm::vec3 Up;
-        glm::vec3 Right;
-        glm::vec3 WorldUp;
         
         float Yaw;
         float Pitch;
-
+        
         float cameraSpeed;
         float mouseSens;
         float Zoom;
-
+        
         void updateCameraVectors();
         
         public:
@@ -44,5 +39,10 @@ class Camera {
         glm::mat4 GetViewMatrix();
         glm::mat4 getProjectionMatrix(float aspectRatio) const;
         glm::vec3 getPosition();
-
-};
+        
+        glm::vec3 Position;
+        glm::vec3 Front;
+        glm::vec3 Up;
+        glm::vec3 Right;
+        glm::vec3 WorldUp;
+    };

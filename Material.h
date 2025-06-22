@@ -15,6 +15,9 @@ class Material {
         float shininess;
         Texture* diffuseMap;
         Texture* specularMap;
+        int materialIndex; // Index in the shader's material array
+        bool hasTransparency; // Flag to indicate if this material has transparency
 
     void Apply();
+    void Apply(int index); // Apply to specific material index
 };

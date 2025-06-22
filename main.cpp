@@ -20,6 +20,8 @@
 #include "PointLight.h"
 #include "Primitives.h"
 #include "Renderer.h"
+#include "DirectionalLight.h"
+#include "SpotLight.h"
 
 #include "Globals.h"
 
@@ -89,6 +91,7 @@ int main()
     basicMaterial.diffuseMap = &boxTex;
     basicMaterial.specularMap = &boxSpec;
     basicMaterial.shininess = 64;
+    basicMaterial.hasTransparency = true;
 
     Model cubeModel;
     Cube cubeMesh(&basicMaterial);
@@ -97,15 +100,36 @@ int main()
     std::vector<Model*> models;
     models.push_back(&cubeModel);
 
+    std::cout << "Attempting to load car model..." << std::endl;
+    Model sponza;
+    sponza.loadModel("Sponza/sponza.obj", &basicShader);
+    models.push_back(&sponza);
     Renderer renderer;
 
+    sponza.setScale(glm::vec3(0.05f, 0.05f, 0.05f));
+    sponza.setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
+    
     PointLight light(glm::vec3(1.2f, 1.0f, 2.0f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.4f, 1.0f, 4.0f));
+    light.setFalloff(1.0f, 0.09f, 0.032f);
     light.applyToShader(basicShader, 0);
     models.push_back(&light.getLightModel());
 
     PointLight light2(glm::vec3(-2.0f, -1.0f, -2.0f), glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.8f, 0.5f), glm::vec3(1.0f, 0.4f, 0.4f));
+    light2.setFalloff(1.0f, 0.09f, 0.032f);
     light2.applyToShader(basicShader, 1);
     models.push_back(&light2.getLightModel());
+
+    DirectionalLight dirLight(glm::vec3(-0.2f, -1.0f, -0.5f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.7f, 0.7f, 0.7f), glm::vec3(1.0f, 1.0f, 1.0f));
+    dirLight.applyToShader(basicShader, 2);
+    models.push_back(&dirLight.getLightModel());
+
+    SpotLight flashLight(glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(17.5f)), cam.getPosition(), cam.Front, glm::vec3(0.1f, 0.1f, 0.1f), glm::vec3(0.5f, 0.8f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f));
+    flashLight.applyToShader(basicShader, 3);
+    models.push_back(&flashLight.getLightModel());
+
+    // Set the total number of lights in the shader
+    basicShader.use();
+    basicShader.setInt("numLights", 4);
 
     glm::vec3 cubePositions[] = {
        glm::vec3( 0.0f,  0.0f,  0.0f), 
@@ -133,6 +157,11 @@ int main()
         //Rendering
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glEnable(GL_DEPTH_TEST);
+        
+        // Enable alpha blending for transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (wireframe)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -140,8 +169,11 @@ int main()
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
         basicShader.use();
-        light.applyToShader(basicShader, 0);
-        light2.applyToShader(basicShader, 1);
+
+        flashLight.setPosition(cam.getPosition());
+        flashLight.Direction = cam.Front;
+        flashLight.applyToShader(basicShader, 3);
+        
         
         for (unsigned int i = 0; i < 10; i++)
         {

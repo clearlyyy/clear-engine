@@ -3,12 +3,8 @@
 
 // Camera Constructor fuck it
 Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
-    : Front(glm::vec3(0.0f, 0.0f, -1.0f)), cameraSpeed(SPEED), mouseSens(SENSITIVITY), Zoom(ZOOM)
+    : Yaw(yaw), Pitch(pitch), cameraSpeed(SPEED), mouseSens(SENSITIVITY), Zoom(ZOOM), Position(pos), WorldUp(up)
 {
-    Position = pos;
-    WorldUp = up;
-    Yaw = yaw;
-    Pitch = pitch;
     updateCameraVectors();
 }
 

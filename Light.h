@@ -1,3 +1,4 @@
+#pragma once
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include "Primitives.h"
@@ -5,7 +6,8 @@
 
 enum LightType {
     TYPE_POINT,
-    TYPE_DIRECTIONAL
+    TYPE_DIRECTIONAL,
+    TYPE_SPOT
 };
 
 class Light {

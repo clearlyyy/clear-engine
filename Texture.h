@@ -17,6 +17,7 @@ class Texture {
 
     void use();
     void setTexture(Shader shaderProgram, const std::string& type);
+    int getChannels() const { return nrChannels; }
 };
 
 #endif // TEXTURE_H

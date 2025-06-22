@@ -10,4 +10,9 @@ class PointLight : public Light
     
     void applyToShader(Shader& shader, int index) const override;
     int getType() const override;
+    void setFalloff(float constant, float linear, float quadratic);
+    float constant;
+    float linear;
+    float quadratic;
+
 };

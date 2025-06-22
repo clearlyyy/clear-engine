@@ -59,7 +59,17 @@
         "optional": "cpp",
         "unordered_map": "cpp",
         "vector": "cpp",
-        "xhash": "cpp"
+        "xhash": "cpp",
+        "chrono": "cpp",
+        "forward_list": "cpp",
+        "map": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "set": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp",
+        "unordered_set": "cpp",
+        "xtree": "cpp"
     },
     "cmake.sourceDirectory": "C:/Users/clearly/Desktop/Code/clear-engine/include/glm"
 }
