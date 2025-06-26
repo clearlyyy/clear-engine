@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include "GUI.h"
 
 Mesh::Mesh() {}
 
@@ -84,6 +85,7 @@ void Mesh::draw(Shader& shader) const {
                 // Draw faces for this material
                 if (!materialIndicesList.empty()) {
                     glDrawElements(GL_TRIANGLES, materialIndicesList.size(), GL_UNSIGNED_INT, materialIndicesList.data());
+                    GUI::IncrementDrawCalls(); // Count this draw call
                 }
             }
         }
@@ -93,7 +95,73 @@ void Mesh::draw(Shader& shader) const {
             materials[0]->Apply();
         }
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        GUI::IncrementDrawCalls(); // Count this draw call
     }
     
+    glBindVertexArray(0);
+}
+
+void Mesh::drawGeometryPass(Shader& shader) const {
+    glBindVertexArray(VAO);
+    
+    // For geometry pass, we need to apply materials to get the correct albedo textures
+    // but we don't do lighting calculations
+    if (!materialIndices.empty() && materials.size() > 1) {
+        // Group faces by material and draw them together
+        for (unsigned int materialIndex = 0; materialIndex < materials.size(); materialIndex++) {
+            if (materials[materialIndex]) {
+                // Set the current material index for the geometry shader
+                shader.setInt("currentMaterialIndex", materialIndex);
+                
+                // Bind the diffuse texture directly to the geometry shader
+                if (materials[materialIndex]->diffuseMap) {
+                    glActiveTexture(GL_TEXTURE0 + materialIndex);
+                    glBindTexture(GL_TEXTURE_2D, materials[materialIndex]->diffuseMap->ID);
+                    shader.setInt("materialDiffuse[" + std::to_string(materialIndex) + "]", materialIndex);
+                }
+                
+                // Collect indices for faces that use this material
+                std::vector<unsigned int> materialIndicesList;
+                for (unsigned int faceIndex = 0; faceIndex < materialIndices.size(); faceIndex++) {
+                    if (materialIndices[faceIndex] == materialIndex) {
+                        // Add the 3 indices for this face
+                        unsigned int baseIndex = faceIndex * 3;
+                        materialIndicesList.push_back(indices[baseIndex]);
+                        materialIndicesList.push_back(indices[baseIndex + 1]);
+                        materialIndicesList.push_back(indices[baseIndex + 2]);
+                    }
+                }
+                
+                // Draw faces for this material
+                if (!materialIndicesList.empty()) {
+                    glDrawElements(GL_TRIANGLES, materialIndicesList.size(), GL_UNSIGNED_INT, materialIndicesList.data());
+                    GUI::IncrementDrawCalls(); // Count this draw call
+                }
+            }
+        }
+    } else {
+        // Fallback: draw entire mesh with first material (or no material)
+        if (!materials.empty() && materials[0]) {
+            shader.setInt("currentMaterialIndex", 0);
+            // Bind the diffuse texture directly
+            if (materials[0]->diffuseMap) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, materials[0]->diffuseMap->ID);
+                shader.setInt("materialDiffuse[0]", 0);
+            }
+        } else {
+            shader.setInt("currentMaterialIndex", -1); // No material
+        }
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+        GUI::IncrementDrawCalls(); // Count this draw call
+    }
+    
+    glBindVertexArray(0);
+}
+
+void Mesh::drawShadowPass(Shader& shader) const
+{
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

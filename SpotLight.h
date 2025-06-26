@@ -8,6 +8,7 @@ class SpotLight : public Light
 
     void applyToShader(Shader& shader, int index) const override;
     int getType() const override;
+    void setDeferredUniforms(Shader& shader, int index, const glm::vec3* viewSpacePos = nullptr, const glm::vec3* viewSpaceDir = nullptr) const override;
     
     float cutOff;
     float outerCutOff;

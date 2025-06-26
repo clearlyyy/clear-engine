@@ -25,8 +25,8 @@ glm::mat4 Camera::GetViewMatrix()
     return glm::lookAt(Position, Position + Front, Up);
 }
 
-glm::mat4 Camera::getProjectionMatrix(float aspectRatio) const {
-    return glm::perspective(glm::radians(70.0f), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+glm::mat4 Camera::getProjectionMatrix(float aspectRatio) {
+    return glm::perspective(glm::radians(Zoom), (float)WINDOW_WIDTH/(float)WINDOW_HEIGHT, 0.01f, 500.0f);
 }
 
 glm::vec3 Camera::getPosition()
@@ -34,9 +34,11 @@ glm::vec3 Camera::getPosition()
     return Position;
 }
 
-void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
+void Camera::processKeyboard(Camera_Movement direction, float deltaTime, bool isSprinting)
 {
     float velocity = cameraSpeed * deltaTime;
+    if (isSprinting)
+        velocity = (cameraSpeed * 4) * deltaTime;
     if (direction == FORWARD)
         Position += Front * velocity;
     if (direction == BACKWARD)
@@ -71,8 +73,8 @@ void Camera::processMouseScroll(float yoffset)
     Zoom -= (float)yoffset;
     if (Zoom < 1.0f)
         Zoom = 1.0f;
-    if (Zoom > 45.0f)
-        Zoom = 45.0f;
+    if (Zoom > 160.0f)
+        Zoom = 160.0f;
 }
 
 

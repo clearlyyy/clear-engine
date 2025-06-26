@@ -30,8 +30,12 @@ class Model {
     void setPosition(const glm::vec3 &position);
     void setRotation(const glm::vec3 &rotation);
     void setScale(const glm::vec3 &scale);
+    void setName(const std::string& name);
+    void setDirty() { dirty = true; }
     
-    glm::mat4 getTransform();
+    std::string name;
+
+    glm::mat4 getTransform() const;
 
     glm::vec3 position;
     glm::vec3 rotation;
@@ -39,8 +43,8 @@ class Model {
 
     private:
 
-    glm::mat4 cachedTransform;
-    bool dirty = true; // True if transform needs updating.
+    mutable glm::mat4 cachedTransform;
+    mutable bool dirty = true; // True if transform needs updating.
 
     std::vector<Mesh> meshes;
     std::string directory;
@@ -49,7 +53,7 @@ class Model {
     // Texture cache to prevent loading the same textures multiple times
     std::map<std::string, Texture*> textureCache;
 
-    void updateTransform();
+    void updateTransform() const;
 
     void processNode(aiNode *node, const aiScene *scene);
     Mesh processMesh(aiMesh *mesh, const aiScene *scene);

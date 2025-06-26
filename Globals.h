@@ -4,3 +4,5 @@
 
 extern const int WINDOW_HEIGHT;
 extern const int WINDOW_WIDTH;
+extern float deltaTime;
+extern float lastFrame;

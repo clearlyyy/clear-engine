@@ -33,6 +33,12 @@ void Light::setDiffuse(glm::vec3 diffuse)
     this->diffuse = diffuse;
 }
 
+void Light::setState(bool state, Shader& shader, int index)
+{
+    this->state = state;
+    shader.setInt("lights[" + std::to_string(index) + "].state", state);
+}
+
 Model& Light::getLightModel() {
     return lightModel;
 }

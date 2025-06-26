@@ -1,8 +1,11 @@
+#pragma once
+
 #include <vector>
 
 #include "Model.h"
 #include "Camera.h"
 #include "Globals.h"
+#include "Shader.h"
 
 
 // Renderer
@@ -13,6 +16,7 @@ class Renderer {
         Renderer();
 
         void render(std::vector<Model*> &models, Camera &camera);
+        void render(std::vector<Model*> &models, Camera &camera, Shader* geometryShader);
 
         
 

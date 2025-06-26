@@ -25,6 +25,11 @@ void Model::setPosition(const glm::vec3 &position)
     dirty = true;
 }
 
+void Model::setName(const std::string& name)
+{
+    this->name = name;
+}
+
 void Model::setRotation(const glm::vec3 &rotation)
 {
     this->rotation = rotation;
@@ -172,7 +177,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
         if (aiMat->GetTexture(aiTextureType_DIFFUSE, 0, &diffusePath) == AI_SUCCESS)
         {
             std::string fullPath = directory + "/" + std::string(diffusePath.C_Str());
-            std::cout << "Loading diffuse texture: " << fullPath << " for material index " << material->materialIndex << std::endl;
             
             // Check if file exists
             std::ifstream fileCheck(fullPath);
@@ -184,9 +188,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
                     // Check if texture has alpha channel (4 channels = RGBA)
                     if (diffuseTex->getChannels() == 4) {
                         material->hasTransparency = true;
-                        std::cout << "Texture has transparency: " << fullPath << std::endl;
                     }
-                    std::cout << "Successfully loaded diffuse texture: " << fullPath << " (ID: " << diffuseTex->ID << ")" << std::endl;
                 } else {
                     material->diffuseMap = nullptr;
                     std::cout << "Failed to load diffuse texture: " << fullPath << std::endl;
@@ -267,7 +269,7 @@ const std::vector<Mesh>& Model::getMeshes() const {
     return meshes;
 }
 
-void Model::updateTransform()
+void Model::updateTransform() const
 {
     cachedTransform = glm::mat4(1.0f);
 
@@ -284,7 +286,7 @@ void Model::updateTransform()
     dirty = false;
 }
 
-glm::mat4 Model::getTransform() {
+glm::mat4 Model::getTransform() const {
     if (dirty)
         updateTransform();
     return cachedTransform;

@@ -9,7 +9,6 @@ static int textureUnitCounter = 0;
 
 Texture::Texture(const char* path, bool transparent)
 {
-    std::cout << "Creating texture from: " << path << std::endl;
     
     //Create Texture and Bind it
     glGenTextures(1, &ID);
@@ -28,15 +27,13 @@ Texture::Texture(const char* path, bool transparent)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    stbi_set_flip_vertically_on_load(true);
+    //stbi_set_flip_vertically_on_load(true);
     
     // Load the image
     unsigned char *data = stbi_load(path, &width, &height, &nrChannels, 0);
 
     if (data)
     {
-        std::cout << "Image loaded successfully: " << width << "x" << height << " channels: " << nrChannels << std::endl;
-        
         // Check if texture size is reasonable and won't cause crashes
         int maxSize = 8192; // Allow up to 8192x8192 textures
         if (width <= 0 || height <= 0 || width > maxSize || height > maxSize) {
@@ -76,7 +73,6 @@ Texture::Texture(const char* path, bool transparent)
         
         // Free the image from memory only if data was successfully loaded
         stbi_image_free(data);
-        std::cout << "Texture created successfully: " << path << " (ID: " << ID << ")" << std::endl;
     } else {
         std::cout << "Failed to load image data: " << path << " - " << stbi_failure_reason() << std::endl;
         ID = 0; // Mark as failed

@@ -27,6 +27,7 @@ struct Light {
     float cutOff;
     float outerCutOff;
 
+    int state; // 0 = off, 1 = on
 };
 
 in vec3 ourColor;
@@ -53,43 +54,44 @@ void main()
 
     for (int i = 0; i < numLights; i++) {
 
-        
-        // Ambient
-        vec3 ambient = lights[i].ambient * texture(materialDiffuse[currentMaterialIndex], TexCoord).rgb;
+        if (lights[i].state == 1) {
+            // Ambient
+            vec3 ambient = lights[i].ambient * texture(materialDiffuse[currentMaterialIndex], TexCoord).rgb;
 
-        // Diffuse
-        vec3 lightDir;
+            // Diffuse
+            vec3 lightDir;
 
-        float attenuation = 1;
-        float intensity = 1;
+            float attenuation = 1;
+            float intensity = 1;
 
-        if (lights[i].type == 0) {
-            lightDir = normalize(lights[i].position - FragPos);
-            float distance    = length(lights[i].position - FragPos);
-            attenuation = 1.0 / (lights[i].constant + lights[i].linear * distance + 
-    		    lights[i].quadratic * (distance * distance));  
-        } else if (lights[i].type == 1) {
-            lightDir = normalize(-lights[i].direction);
-        } else if (lights[i].type == 2) {
-            lightDir = normalize(lights[i].position - FragPos);
-            float theta = dot(lightDir, normalize(-lights[i].direction));
-            float epsilon = (lights[i].cutOff - lights[i].outerCutOff);
-            intensity = clamp((theta - lights[i].outerCutOff) / epsilon, 0.0, 1.0);
-            attenuation = 1.0;
+            if (lights[i].type == 0) {
+                lightDir = normalize(lights[i].position - FragPos);
+                float distance    = length(lights[i].position - FragPos);
+                attenuation = 1.0 / (lights[i].constant + lights[i].linear * distance + 
+    	    	    lights[i].quadratic * (distance * distance));  
+            } else if (lights[i].type == 1) {
+                lightDir = normalize(-lights[i].direction);
+            } else if (lights[i].type == 2) {
+                lightDir = normalize(lights[i].position - FragPos);
+                float theta = dot(lightDir, normalize(-lights[i].direction));
+                float epsilon = (lights[i].cutOff - lights[i].outerCutOff);
+                intensity = clamp((theta - lights[i].outerCutOff) / epsilon, 0.0, 1.0);
+                attenuation = 1.0;
+            }
+            float diff = max(dot(norm, lightDir), 0.0);
+            vec3 diffuse = lights[i].diffuse * diff * texture(materialDiffuse[currentMaterialIndex], TexCoord).rgb;
+
+            //Specular
+            vec3 reflectDir = reflect(-lightDir, norm);
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+            vec3 specular = lights[i].specular * spec * vec3(texture(materialSpecular[currentMaterialIndex], TexCoord));
+
+            ambient *= attenuation;
+            diffuse *= attenuation * intensity;
+            specular *= attenuation * intensity;
+
+            result += ambient + diffuse + specular;
         }
-        float diff = max(dot(norm, lightDir), 0.0);
-        vec3 diffuse = lights[i].diffuse * diff * texture(materialDiffuse[currentMaterialIndex], TexCoord).rgb;
-
-        //Specular
-        vec3 reflectDir = reflect(-lightDir, norm);
-        float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-        vec3 specular = lights[i].specular * spec * vec3(texture(materialSpecular[currentMaterialIndex], TexCoord));
-
-        ambient *= attenuation;
-        diffuse *= attenuation * intensity;
-        specular *= attenuation * intensity;
-
-        result += ambient + diffuse + specular;
     }
 
     // Get alpha from diffuse texture for transparency
